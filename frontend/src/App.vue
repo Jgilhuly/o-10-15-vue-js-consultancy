@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" :class="{ 'dark-mode': isDarkMode }">
     <!-- Navigation -->
     <nav class="nav">
       <div class="container">
@@ -12,6 +12,10 @@
             <a href="#calculator">Calculator</a>
             <a href="#team">Team</a>
             <a href="#contact">Contact</a>
+            <button @click="toggleDarkMode" class="dark-mode-toggle" :aria-label="isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'">
+              <span v-if="isDarkMode">☀️</span>
+              <span v-else>🌙</span>
+            </button>
           </div>
         </div>
       </div>
@@ -499,6 +503,7 @@ import axios from 'axios'
 export default {
   name: 'App',
   setup() {
+    const isDarkMode = ref(false)
     const services = ref([])
     const team = ref([])
     const contactInfo = ref({})
@@ -763,6 +768,21 @@ export default {
       return num.toLocaleString('en-US')
     }
 
+    const toggleDarkMode = () => {
+      isDarkMode.value = !isDarkMode.value
+      localStorage.setItem('darkMode', isDarkMode.value.toString())
+    }
+
+    const initDarkMode = () => {
+      const savedMode = localStorage.getItem('darkMode')
+      if (savedMode !== null) {
+        isDarkMode.value = savedMode === 'true'
+      } else {
+        // Check system preference
+        isDarkMode.value = window.matchMedia('(prefers-color-scheme: dark)').matches
+      }
+    }
+
     const fetchData = async () => {
       try {
         const [servicesRes, teamRes, contactRes] = await Promise.all([
@@ -830,9 +850,14 @@ export default {
       }
     }
 
-    onMounted(fetchData)
+    onMounted(() => {
+      initDarkMode()
+      fetchData()
+    })
 
     return {
+      isDarkMode,
+      toggleDarkMode,
       services,
       team,
       contactInfo,
@@ -851,8 +876,7 @@ export default {
       submitQuoteRequest,
       calculateEstimate,
       getServiceName,
-      formatNumber
-      ,
+      formatNumber,
       // Quiz
       quizQuestions,
       quizAnswers,
