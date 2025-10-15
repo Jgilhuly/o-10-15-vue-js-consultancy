@@ -4,7 +4,7 @@
     <nav class="nav">
       <div class="container">
         <div class="nav-content">
-          <div class="nav-brand">NeuraLink AI</div>
+          <div class="nav-brand">Area</div>
           <div class="nav-links">
             <a href="#home">Home</a>
             <a href="#services">Services</a>
@@ -117,8 +117,8 @@
     <!-- Footer -->
     <footer class="footer">
       <div class="container text-center">
-        <div class="text-2xl font-bold mb-4">NeuraLink AI</div>
-        <p class="text-gray-400">© 2024 NeuraLink AI. All rights reserved.</p>
+        <div class="text-2xl font-bold mb-4">Area</div>
+        <p class="text-gray-400">© 2025 Area. All rights reserved.</p>
       </div>
     </footer>
 
