@@ -34,6 +34,7 @@ const contactInfo = {
 
 // Demo consultation requests storage (in production, this would be a database)
 let consultationRequests = [];
+let quoteRequests = [];
 
 // GET /api/contact - Get contact information
 router.get('/', (req, res) => {
@@ -98,6 +99,112 @@ router.get('/consultation-requests/:id', (req, res) => {
     return res.status(404).json({
       error: 'Request not found',
       message: `Consultation request with ID ${id} does not exist`
+    });
+  }
+  
+  res.json(request);
+});
+
+// POST /api/contact/quote - Submit quote request
+router.post('/quote', (req, res) => {
+  const { 
+    name, 
+    email, 
+    company, 
+    phone,
+    message, 
+    selectedServices,
+    projectScope,
+    teamSize,
+    urgency,
+    includeSupport,
+    includeTraining,
+    estimatedTotal 
+  } = req.body;
+  
+  // Basic validation
+  if (!name || !email || !company) {
+    return res.status(400).json({
+      error: 'Missing required fields',
+      message: 'Name, email, and company are required'
+    });
+  }
+  
+  // Email validation (basic)
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({
+      error: 'Invalid email',
+      message: 'Please provide a valid email address'
+    });
+  }
+
+  // Validate selected services
+  if (!selectedServices || selectedServices.length === 0) {
+    return res.status(400).json({
+      error: 'No services selected',
+      message: 'Please select at least one service'
+    });
+  }
+  
+  const request = {
+    id: quoteRequests.length + 1,
+    name,
+    email,
+    company,
+    phone: phone || 'Not provided',
+    message: message || 'No additional details provided',
+    selectedServices,
+    projectDetails: {
+      scope: projectScope,
+      teamSize,
+      urgency,
+      includeSupport,
+      includeTraining
+    },
+    estimatedTotal,
+    timestamp: new Date().toISOString(),
+    status: 'pending'
+  };
+  
+  quoteRequests.push(request);
+  
+  console.log('Quote request received:', {
+    id: request.id,
+    company: request.company,
+    services: selectedServices,
+    estimatedTotal: estimatedTotal
+  });
+  
+  res.status(201).json({
+    message: 'Quote request submitted successfully',
+    requestId: request.id,
+    estimatedResponseTime: '24 hours',
+    nextSteps: [
+      'Our team will review your requirements',
+      'We will prepare a detailed proposal',
+      'You will receive a personalized quote via email'
+    ]
+  });
+});
+
+// GET /api/contact/quote-requests - Get all quote requests (demo purposes)
+router.get('/quote-requests', (req, res) => {
+  res.json({
+    total: quoteRequests.length,
+    requests: quoteRequests
+  });
+});
+
+// GET /api/contact/quote-requests/:id - Get specific quote request
+router.get('/quote-requests/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  const request = quoteRequests.find(r => r.id === id);
+  
+  if (!request) {
+    return res.status(404).json({
+      error: 'Request not found',
+      message: `Quote request with ID ${id} does not exist`
     });
   }
   
